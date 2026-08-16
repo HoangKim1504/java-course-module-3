@@ -731,24 +731,119 @@ WHERE weight > (SELECT AVG(weight) FROM patients);
 
 **Bài tập thêm:**
 
-1. Viết câu lệnh `CREATE TABLE` cho bảng `orders` có quan hệ 1-n với `customers`.
-2. Thiết kế bảng trung gian cho quan hệ n-n giữa `products` và `orders`.
-3. Viết `UPDATE` tăng `height` thêm 1 cho mọi bệnh nhân ở thành phố `'Hamilton'` — kiểm tra `WHERE` cẩn thận.
+**1. Viết câu lệnh `CREATE TABLE` cho bảng `orders` có quan hệ 1-n với `customers`.**
+
+- Một customer có thể có nhiều orders.
+- Vì vậy bảng orders phải chứa customer_id.
+- customer_id là Foreign Key trỏ tới customers(id).
+```sql
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    order_date DATE,
+    customer_id INT,
+
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+); 
+```
+
+**2. Thiết kế bảng trung gian cho quan hệ n-n giữa `products` và `orders`.**
+
+- Một order có nhiều product, một product có thể nằm trong nhiều order.
+- 1 order có nhiều product.
+- 1 product cũng có thể xuất hiện trong nhiều order.
+- Đây là quan hệ n-n.
+- Relational database không nối trực tiếp n-n, nên cần bảng trung gian.
+```sql
+CREATE TABLE order_products (
+        order_id INT,
+        product_id INT,
+        quantity INT,
+
+        PRIMARY KEY (order_id, product_id),
+
+        FOREIGN KEY (order_id) REFERENCES orders(id),
+        FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+**3. Viết `UPDATE` tăng `height` thêm 1 cho mọi bệnh nhân ở thành phố `'Hamilton'` — kiểm tra `WHERE` cẩn thận.**
+
+- Nên kiểm tra trước:
+```sql
+SELECT *
+FROM patients
+WHERE city = 'Hamilton';
+```
+
+- Sau đó mới update:
+```sql
+UPDATE patients
+SET height = height + 1
+WHERE city = 'Hamilton';
+```
+-> Không được quên WHERE, nếu không height của tất cả bệnh nhân sẽ tăng thêm 1.
 
 ### Câu hỏi ôn tập
 
-1. Database khác hệ thống file ở những điểm nào?
-2. Phân biệt structured / semi-structured / unstructured data.
-3. Khi nào nên chọn SQL, khi nào nên chọn NoSQL?
-4. Một bảng có thể có bao nhiêu Primary Key? PK gồm nhiều cột gọi là gì?
-5. Vai trò chính của Foreign Key là gì?
-6. Quan hệ n-n được hiện thực như thế nào trong relational database?
-7. Vì sao thứ tự `JOIN` và `WHERE` lại quan trọng?
-8. Điều gì xảy ra nếu chạy `UPDATE`/`DELETE` mà quên `WHERE`?
-9. Phân biệt `WHERE` và `HAVING`. Khi nào bắt buộc dùng `HAVING`?
-10. Kể tên 4 hàm tổng hợp và cho biết `GROUP BY` dùng để làm gì.
-11. `CHECK` và `UNIQUE` constraint khác nhau ở điểm nào?
-12. Vì sao `WHERE allergies = NULL` không trả về kết quả? Viết lại cho đúng.
+**1. Database khác hệ thống file ở những điểm nào?**
+
+→ Database hỗ trợ query, quan hệ, constraint, transaction và phân quyền tốt hơn file thường.
+
+**2. Phân biệt structured / semi-structured / unstructured data.**
+
+→ Structured: có schema rõ.
+<br>→ Semi-structured: cấu trúc linh hoạt, như JSON/XML.
+<br>→ Unstructured: không có schema rõ, như ảnh, video, PDF.
+
+**3. Khi nào nên chọn SQL, khi nào nên chọn NoSQL?**
+
+→ SQL: dữ liệu có quan hệ rõ, cần consistency/transaction.
+<br>→ NoSQL: schema linh hoạt, dữ liệu lớn, cần scale tốt.
+
+**4. Một bảng có thể có bao nhiêu Primary Key? PK gồm nhiều cột gọi là gì?**
+
+→ Một bảng chỉ có 1 Primary Key.
+<br>→ PK gồm nhiều cột gọi là Composite Primary Key.
+
+**5. Vai trò chính của Foreign Key là gì?**
+
+→ Liên kết các bảng và đảm bảo referential integrity.
+
+**6. Quan hệ n-n được hiện thực như thế nào trong relational database?**
+
+→ Dùng bảng trung gian chứa Foreign Key của hai bảng.
+
+**7. Vì sao thứ tự `JOIN` và `WHERE` lại quan trọng?**
+
+→ JOIN ghép dữ liệu, WHERE lọc dữ liệu; viết sai có thể cho kết quả sai hoặc query chậm.
+
+**8. Điều gì xảy ra nếu chạy `UPDATE`/`DELETE` mà quên `WHERE`?**
+
+→ Toàn bộ các dòng trong bảng có thể bị cập nhật hoặc xóa.
+
+**9. Phân biệt `WHERE` và `HAVING`. Khi nào bắt buộc dùng `HAVING`?**
+
+→ WHERE: lọc dòng trước GROUP BY.
+<br>→ HAVING: lọc nhóm sau GROUP BY.
+<br>→ Dùng HAVING khi lọc theo COUNT(), SUM(), AVG()...
+
+**10. Kể tên 4 hàm tổng hợp và cho biết `GROUP BY` dùng để làm gì.**
+
+→ COUNT(), SUM(), AVG(), MAX() / MIN().
+<br>→ GROUP BY dùng để nhóm các dòng có cùng giá trị.
+
+**11. `CHECK` và `UNIQUE` constraint khác nhau ở điểm nào?**
+
+→ CHECK: kiểm tra điều kiện dữ liệu.
+<br>→ UNIQUE: không cho giá trị bị trùng.
+
+**12. Vì sao `WHERE allergies = NULL` không trả về kết quả? Viết lại cho đúng.**
+
+→ Vì NULL không thể so sánh bằng =.
+
+```sql
+WHERE allergies IS NULL
+```
 
 ### Liên kết tham khảo
 
