@@ -1,5 +1,8 @@
 # Bài 1: Cơ sở dữ liệu cơ bản
 
+### Bài học tham khảo
+- [Bài 1: Cơ sở dữ liệu cơ bản — Github module 3](https://github.com/nguyenvudangkhoa189/t3h-ltv-java-module-3/blob/dev/syllabus/module-3/java_m3_bai1_Basic_Database.md)
+
 ## Mục tiêu bài học
 
 Sau bài này, học viên có thể:
@@ -146,6 +149,34 @@ Ví dụ bảng `patients` (bệnh nhân):
 | `DATE` / `DATETIME` | Ngày, giờ | `birth_date` |
 | `DECIMAL(p,s)` | Số thập phân chính xác (tiền tệ) | `price` |
 | `BOOLEAN` | Đúng/sai | `is_active` |
+
+**Note:**
+
+1. `DECIMAL(p, s)` dùng để lưu số thập phân chính xác.
+
+   - `p`: tổng số chữ số.
+   - `s`: số chữ số sau dấu `.`.
+   - Số chữ số trước dấu `.` = `p - s`.
+
+    Ví dụ:
+  
+    ```sql
+    DECIMAL(10, 2)
+    ```
+  
+    → Tối đa `8` số trước dấu `.` và `2` số sau dấu `.`.
+  
+    ```text
+    12345678.99 ✅
+    ```
+  
+    Trong Java nên dùng:
+  
+    ```java
+    BigDecimal price;
+    ```
+
+    Thường dùng cho **tiền, giá, tỷ lệ**.
 
 ### 4.2. Khóa chính (Primary Key — PK)
 
